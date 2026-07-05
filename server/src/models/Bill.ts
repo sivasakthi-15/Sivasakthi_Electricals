@@ -37,19 +37,96 @@ const totalsSchema = new mongoose.Schema(
 
 const billSchema = new mongoose.Schema(
   {
-    billNumber: { type: String, required: true, unique: true },
-    billType: { type: String, required: true, enum: ["contractor", "normal"] },
-    shop: { type: String, required: true, enum: ["sivasakthi", "meenatchi"] },
-    gstMode: { type: String, enum: ["on", "off"], default: "off" },
-    status: { type: String, enum: ["draft", "saved"], default: "saved" },
-    customer: { type: customerSchema, default: () => ({}) },
-    items: { type: [lineItemSchema], default: [] },
-    totals: { type: totalsSchema, default: () => ({}) },
+    // Basic Details
+    billNumber: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+
+    billType: {
+      type: String,
+      required: true,
+      enum: ["contractor", "normal"],
+    },
+
+    shop: {
+      type: String,
+      required: true,
+      enum: ["sivasakthi", "meenatchi"],
+    },
+
+    gstMode: {
+      type: String,
+      enum: ["on", "off"],
+      default: "off",
+    },
+
+    // Bill Status
+    status: {
+      type: String,
+      enum: ["active", "cancelled"],
+      default: "active",
+    },
+
+    // Customer Details
+    customer: {
+      type: customerSchema,
+      default: () => ({}),
+    },
+
+    // Bill Items
+    items: {
+      type: [lineItemSchema],
+      default: [],
+    },
+
+    // Bill Totals
+    totals: {
+      type: totalsSchema,
+      default: () => ({}),
+    },
+
+    // Cancellation Information
+    cancelledAt: {
+      type: Date,
+      default: null,
+    },
+
+    cancelReason: {
+      type: String,
+      default: "",
+    },
+
+    cancelledBy: {
+      type: String,
+      default: "",
+    },
+
+    // Edit History
+    lastEditedAt: {
+      type: Date,
+      default: null,
+    },
+
+    lastEditedBy: {
+      type: String,
+      default: "",
+    },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
-billSchema.index({ "customer.name": "text", "customer.mobile": "text" });
-billSchema.index({ createdAt: -1 });
+// Search Indexes
+billSchema.index({
+  "customer.name": "text",
+  "customer.mobile": "text",
+});
+
+billSchema.index({
+  createdAt: -1,
+});
 
 export const Bill = mongoose.model("Bill", billSchema);
