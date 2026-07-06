@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { Bill } from "../models/Bill.js";
 import { Counter } from "../models/Counter.js";
+import { updateOrCreateProduct } from "../services/product.service.js";
 import {
   formatBillNumber,
   getFinancialYearLabel,
@@ -113,6 +114,14 @@ router.post("/", async (req, res) => {
       createdAt: invoiceDate,
       updatedAt: new Date(),
     });
+
+    await updateOrCreateProduct(
+      doc.items.map((item: any) => ({
+        description: item.description,
+        rate: item.rate,
+        unit: item.unit,
+      }))
+    );
 
     return res.status(201).json(doc.toObject());
   } catch (e) {

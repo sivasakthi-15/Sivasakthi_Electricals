@@ -4,6 +4,7 @@ import express from "express";
 import mongoose from "mongoose";
 import billsRouter from "./routes/bills.js";
 import countersRouter from "./routes/counters.js";
+import productsRouter from "./routes/products.js";
 
 const PORT = Number(process.env.PORT) || 4000;
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/electrical_billing";
@@ -16,6 +17,7 @@ app.use(express.json({ limit: "2mb" }));
 app.get("/api/health", (_req, res) => res.json({ ok: true }));
 app.use("/api/counters", countersRouter);
 app.use("/api/bills", billsRouter);
+app.use("/api/products", productsRouter);
 
 mongoose
   .connect(MONGODB_URI)
