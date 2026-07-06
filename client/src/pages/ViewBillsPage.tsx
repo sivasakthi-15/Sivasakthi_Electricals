@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { deleteBill, searchBills } from "@/api/client";
+import { cancelBill, searchBills } from "@/api/client";
 import type { BillPayload } from "@/types/bill";
 import { SHOPS } from "@/constants/shops";
 
@@ -32,13 +32,24 @@ export function ViewBillsPage() {
     void load();
   }, [load]);
 
-  const remove = async (id: string) => {
-    if (!confirm("Delete this bill permanently?")) return;
+  const cancel = async (id: string) => {
+    if (!confirm("Cancel this bill?")) return;
+
     try {
-      await deleteBill(id);
-      setRows((r) => r.filter((x) => x._id !== id));
+      await cancelBill(id, "Cancelled by shop owner");
+
+      setRows((rows) =>
+        rows.map((row) =>
+          row._id === id
+            ? {
+                ...row,
+                status: "cancelled",
+              }
+            : row
+        )
+      );
     } catch {
-      alert("Delete failed");
+      alert("Failed to cancel bill.");
     }
   };
 
@@ -61,43 +72,45 @@ export function ViewBillsPage() {
 
   return (
     <div className="card">
-      <h2 style={{ marginTop: 0 }}>View bills</h2>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", marginBottom: "1rem" }}>
+      <h2 className="card-title">Bill History</h2>
+      <div className="toolbar search-toolbar">
         <input
           placeholder="Search name, mobile, bill no."
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          style={{ flex: "1 1 200px", padding: "0.5rem", borderRadius: 8, border: "1px solid #cbd5e1" }}
+          className="search-input"
         />
         <input
           type="date"
+          title="From date"
           value={dateFrom}
           onChange={(e) => setDateFrom(e.target.value)}
-          style={{ padding: "0.5rem", borderRadius: 8, border: "1px solid #cbd5e1" }}
+          className="date-input"
         />
         <input
           type="date"
+          title="To date"
           value={dateTo}
           onChange={(e) => setDateTo(e.target.value)}
-          style={{ padding: "0.5rem", borderRadius: 8, border: "1px solid #cbd5e1" }}
+          className="date-input"
         />
-        <button type="button" className="btn btn-secondary" onClick={() => void load()}>
-          Search
-        </button>
+
       </div>
-      {err && <p style={{ color: "#b91c1c" }}>{err}</p>}
+      {err && <p className="error-text">{err}</p>}
       {loading ? (
         <p>Loading…</p>
       ) : (
-        <div style={{ overflowX: "auto" }}>
+        <div className="table-wrap">
           <table className="bill-list">
             <thead>
               <tr>
-                <th>Bill no.</th>
+                <th>Bill No.</th>
                 <th>Shop</th>
                 <th>Date</th>
                 <th>Customer</th>
                 <th>Mobile</th>
+                <th>Bill Type</th>
+                <th>Status</th>
                 <th className="num">Total</th>
                 <th>Actions</th>
               </tr>
@@ -114,20 +127,41 @@ export function ViewBillsPage() {
                   </td>
                   <td>{r.customer?.name}</td>
                   <td>{r.customer?.mobile}</td>
+                  <td>
+                    {r.billType === "contractor" ? "Contractor" : "Normal"}
+                  </td>
+
+                  <td>
+                    {r.status === "cancelled"
+                      ? "🔴 Cancelled"
+                      : "🟢 Active"}
+                  </td>
+
                   <td className="num">₹{r.totals?.grandTotal?.toFixed(2)}</td>
                   <td>
                     <div className="row-actions">
                       <button type="button" className="btn btn-secondary" onClick={() => view(r)}>
                         View
                       </button>
-                      <button type="button" className="btn btn-secondary" onClick={() => edit(r)}>
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
+                        disabled={r.status === "cancelled"}
+                        onClick={() => edit(r)}
+                      >
                         Edit
                       </button>
+
                       <button type="button" className="btn btn-secondary" onClick={() => duplicate(r)}>
                         Duplicate
                       </button>
-                      <button type="button" className="btn btn-danger" onClick={() => remove(r._id)}>
-                        Delete
+                      <button
+                        type="button"
+                        className="btn btn-danger"
+                        disabled={r.status === "cancelled"}
+                        onClick={() => cancel(r._id)}
+                      >
+                        Cancel
                       </button>
                     </div>
                   </td>
@@ -135,10 +169,10 @@ export function ViewBillsPage() {
               ))}
             </tbody>
           </table>
-          {!rows.length && <p style={{ color: "#64748b" }}>No bills found.</p>}
+          {!rows.length && <p className="muted-text">No bills found.</p>}
         </div>
       )}
-      <p style={{ marginTop: "1rem" }}>
+      <p className="mt-1">
         <Link to="/">← Back</Link>
       </p>
     </div>

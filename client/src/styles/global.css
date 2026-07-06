@@ -262,6 +262,47 @@ button {
   color: #64748b;
 }
 
+/* Page-specific helpers for ViewBillsPage */
+.card-title {
+  margin-top: 0;
+}
+
+.search-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.search-input {
+  flex: 1 1 200px;
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+}
+
+.date-input {
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+}
+
+.error-text {
+  color: #b91c1c;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.muted-text {
+  color: #64748b;
+}
+
+.mt-1 {
+  margin-top: 1rem;
+}
+
 .row-actions {
   display: flex;
   gap: 0.35rem;
