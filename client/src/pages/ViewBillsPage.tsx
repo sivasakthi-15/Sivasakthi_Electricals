@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { cancelBill, searchBills } from "@/api/client";
 import type { BillPayload } from "@/types/bill";
 import { SHOPS } from "@/constants/shops";
@@ -53,21 +53,28 @@ export function ViewBillsPage() {
     }
   };
 
-  const duplicate = (row: Row) => {
-    const q = new URLSearchParams({
-      type: row.billType,
-      shop: row.shop,
-      duplicate: row._id,
-    });
-    nav(`/bill?${q.toString()}`);
-  };
-
   const edit = (row: Row) => {
-    nav(`/bill?edit=${row._id}`);
+    nav(`/bill?edit=${row._id}`, {
+      state: {
+        from: "/bills",
+      },
+    });
   };
 
   const view = (row: Row) => {
-    nav(`/bill?view=${row._id}`);
+    nav(`/bill?view=${row._id}`, {
+      state: {
+        from: "/bills",
+      },
+    });
+  };
+
+  const duplicate = (row: Row) => {
+    nav(`/bill?duplicate=${row._id}`, {
+      state: {
+        from: "/bills",
+      },
+    });
   };
 
   return (
@@ -140,9 +147,14 @@ export function ViewBillsPage() {
                   <td className="num">₹{r.totals?.grandTotal?.toFixed(2)}</td>
                   <td>
                     <div className="row-actions">
-                      <button type="button" className="btn btn-secondary" onClick={() => view(r)}>
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={() => view(r)}
+                      >
                         View
                       </button>
+
                       <button
                         type="button"
                         className="btn btn-secondary"
@@ -152,9 +164,14 @@ export function ViewBillsPage() {
                         Edit
                       </button>
 
-                      <button type="button" className="btn btn-secondary" onClick={() => duplicate(r)}>
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={() => duplicate(r)}
+                      >
                         Duplicate
                       </button>
+
                       <button
                         type="button"
                         className="btn btn-danger"
@@ -173,7 +190,9 @@ export function ViewBillsPage() {
         </div>
       )}
       <p className="mt-1">
-        <Link to="/">← Back</Link>
+        <button type="button" className="btn btn-link" onClick={() => nav(-1)}>
+          ← Back
+        </button>
       </p>
     </div>
   );

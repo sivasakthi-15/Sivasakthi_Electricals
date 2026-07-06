@@ -1,12 +1,16 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 import { BillA4 } from "@/components/BillA4";
 import { Modal } from "@/components/Modal";
 import {
   createBill,
   fetchCounter,
   fetchCustomerSuggestions,
-  fetchProductSuggestions,
   getBill,
   saveAsNewBill,
   updateBillOverwrite,
@@ -17,9 +21,10 @@ import { computeBillTotals } from "@/utils/calculations";
 import { buildDisplayRows } from "@/utils/lineRows";
 import { downloadBillPdf } from "@/utils/pdf";
 import { buildBillShareText, openWhatsAppShare } from "@/utils/whatsapp";
-import { clearDraft, loadDraft, saveDraft, useAutoSaveDraft } from "@/hooks/useDraftStorage";
+import { clearDraft, loadDraft, useAutoSaveDraft } from "@/hooks/useDraftStorage";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { createEmptyBill, defaultItems, emptyLine, ROWS } from "@/state/emptyBill";
+import { ProductAutocomplete } from "@/components/ProductAutocomplete";
 
 function padItems(items: LineItem[]): LineItem[] {
   const next = items.slice(0, ROWS).map((x) => ({ ...x }));
@@ -73,6 +78,8 @@ function inferUnitFromDescription(description: string): string {
 
 export function BillingPage() {
   const [sp] = useSearchParams();
+  const navigate = useNavigate();
+  const location = useLocation();
   const editId = sp.get("edit");
   const viewId = sp.get("view");
   const dupId = sp.get("duplicate");
@@ -81,20 +88,37 @@ export function BillingPage() {
 
   const readOnly = Boolean(viewId);
 
+  useEffect(() => {
+    // If the billing page was opened directly (no prior browser history)
+    // and it's not an edit/view/duplicate flow, send user to HomePage
+    // so they can select shop/type first.
+    try {
+      if (
+        typeof window !== "undefined" &&
+        window.history.length <= 1 &&
+        !location.state?.from &&
+        !editId &&
+        !viewId &&
+        !dupId
+      ) {
+        navigate("/", { replace: true });
+      }
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
   const [editingId, setEditingId] = useState<string | null>(null);
   const [bill, setBill] = useState<BillPayload>(() =>
     createEmptyBill(typeQ ?? "normal", shopQ ?? "sivasakthi")
   );
-  const [freightInput, setFreightInput] = useState(0);
   const [upiId, setUpiId] = useState("");
   const [tempDisplayNumber, setTempDisplayNumber] = useState("—");
   const [invoiceDate, setInvoiceDate] = useState(() => new Date());
-  const [showDraftBanner, setShowDraftBanner] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showPrintModal, setShowPrintModal] = useState(false);
   const [showChangeShopModal, setShowChangeShopModal] = useState(false);
   const [pendingShop, setPendingShop] = useState<ShopId | null>(null);
-  const [productOpts, setProductOpts] = useState<string[]>([]);
   const [customerOpts, setCustomerOpts] = useState<{ name: string; mobile: string; place: string }[]>(
     []
   );
@@ -127,7 +151,6 @@ export function BillingPage() {
               items: padItems(b.items ?? []),
             })
           );
-          setFreightInput(b.totals?.freight ?? 0);
           setUpiId(SHOPS[b.shop].defaultUpi);
           setInvoiceDate(b.createdAt ? new Date(b.createdAt) : new Date());
           await refreshTemp(b.shop);
@@ -149,7 +172,6 @@ export function BillingPage() {
               status: "draft",
             })
           );
-          setFreightInput(b.totals?.freight ?? 0);
           setUpiId(SHOPS[b.shop].defaultUpi);
           setInvoiceDate(new Date());
           await refreshTemp(b.shop);
@@ -161,12 +183,20 @@ export function BillingPage() {
       const bt = typeQ ?? "normal";
       const sh = shopQ ?? "sivasakthi";
       const draft = loadDraft();
-      if (draft && draft.billType === bt && draft.shop === sh) {
-        setShowDraftBanner(true);
-      }
+
+    if (draft && draft.billType === bt && draft.shop === sh) {
+      setBill(
+        normalizeBill({
+          ...draft,
+          items: padItems(draft.items ?? []),
+        })
+      );
+
+      setUpiId(draft.upiId ?? SHOPS[draft.shop].defaultUpi);
+    } else {
       setBill(createEmptyBill(bt, sh));
-      setFreightInput(0);
       setUpiId(SHOPS[sh].defaultUpi);
+    }
       setInvoiceDate(new Date());
       await refreshTemp(sh);
     })();
@@ -178,8 +208,7 @@ export function BillingPage() {
   useEffect(() => {
     (async () => {
       try {
-        const [p, c] = await Promise.all([fetchProductSuggestions(), fetchCustomerSuggestions()]);
-        setProductOpts(p);
+        const c = await fetchCustomerSuggestions();
         setCustomerOpts(c);
       } catch {
         /* offline */
@@ -193,9 +222,9 @@ export function BillingPage() {
         billType: bill.billType,
         gstMode: bill.billType === "contractor" ? "on" : bill.gstMode,
         items: bill.items,
-        freight: freightInput,
+        freight: 0,
       }),
-    [bill.billType, bill.gstMode, bill.items, freightInput]
+    [bill.billType, bill.gstMode, bill.items]
   );
 
   const displayBill = useMemo(
@@ -223,9 +252,10 @@ export function BillingPage() {
     const body = {
       ...bill,
       totals: liveTotals,
+      status: bill.status === "draft" ? "active" : bill.status,
       createdAt: invoiceDate.toISOString(),
     };
-    const { billNumber: _bn, status: _st, _id: _i, ...rest } = body as BillPayload & {
+    const { billNumber: _bn, _id: _i, ...rest } = body as BillPayload & {
       _id?: string;
     };
     const saved = await createBill(rest);
@@ -316,23 +346,6 @@ export function BillingPage() {
     onPrint: onPrintClick,
   });
 
-  const restoreDraft = () => {
-    const d = loadDraft();
-    if (!d) return;
-    setBill(
-      normalizeBill({
-        billType: d.billType,
-        shop: d.shop,
-        gstMode: d.gstMode,
-        customer: d.customer,
-        items: padItems(d.items ?? []),
-      })
-    );
-    setFreightInput(d.totals?.freight ?? 0);
-    setUpiId(d.upiId ?? SHOPS[d.shop].defaultUpi);
-    setShowDraftBanner(false);
-  };
-
   const changeLine = (idx: number, patch: Partial<LineItem>) => {
     setBill((prev) => {
       const items = prev.items.map((x, i) => (i === idx ? { ...x, ...patch } : x));
@@ -355,9 +368,9 @@ export function BillingPage() {
   return (
     <div>
       <div className="toolbar">
-        <Link to="/" className="btn btn-secondary">
-          ← Home
-        </Link>
+        <button type="button" className="btn btn-secondary" onClick={() => navigate(-1)}>
+          ← Back
+        </button>
         <Link to="/bills" className="btn btn-secondary">
           View bills
         </Link>
@@ -417,32 +430,18 @@ export function BillingPage() {
         )}
       </div>
 
-      {showDraftBanner && (
-        <div className="draft-banner">
-          <span>Draft found for this bill type and shop.</span>
-          <div style={{ display: "flex", gap: 8 }}>
-            <button type="button" className="btn btn-primary" onClick={restoreDraft}>
-              Restore draft
-            </button>
-            <button type="button" className="btn btn-secondary" onClick={() => setShowDraftBanner(false)}>
-              Dismiss
-            </button>
-          </div>
-        </div>
-      )}
-
-      {error && <p style={{ color: "#b91c1c" }}>{error}</p>}
+      {error && <p className="error-text">{error}</p>}
 
       <div className="billing-layout">
         <div className="card">
-          <h3 style={{ marginTop: 0 }}>Bill details</h3>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
-            <div className="field" style={{ flex: "1 1 140px" }}>
+          <h3 className="card-subtitle">Bill details</h3>
+          <div className="form-row">
+            <div className="field field-flex-140">
               <label htmlFor="invoice-preview">Invoice no. (preview)</label>
               <input id="invoice-preview" readOnly value={displayNumber} />
             </div>
-            <div className="field" style={{ flex: "1 1 140px" }}>
-              <label>Date</label>
+            <div className="field field-flex-140">
+              <label htmlFor="invoice-date">Date</label>
               <input
                 id="invoice-date"
                 type="datetime-local"
@@ -452,7 +451,7 @@ export function BillingPage() {
               />
             </div>
             {bill.billType === "normal" && (
-              <div className="field" style={{ flex: "1 1 160px" }}>
+              <div className="field field-flex-160">
                 <label htmlFor="invoice-gst">GST</label>
                 <select
                   id="invoice-gst"
@@ -467,7 +466,7 @@ export function BillingPage() {
                 </select>
               </div>
             )}
-            <div className="field" style={{ flex: "1 1 200px" }}>
+            <div className="field field-flex-200">
               <label htmlFor="upi-id">UPI ID (QR)</label>
               <input
                 id="upi-id"
@@ -476,20 +475,10 @@ export function BillingPage() {
                 onChange={(e) => setUpiId(e.target.value)}
               />
             </div>
-            <div className="field" style={{ flex: "1 1 120px" }}>
-              <label htmlFor="freight">Freight</label>
-              <input
-                id="freight"
-                type="number"
-                disabled={readOnly}
-                value={freightInput}
-                onChange={(e) => setFreightInput(Number(e.target.value) || 0)}
-              />
-            </div>
           </div>
 
           <h4>Customer</h4>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
+          <div className="grid-3">
             <div className="field">
               <label htmlFor="customer-name">Name</label>
               <input
@@ -538,7 +527,7 @@ export function BillingPage() {
           </datalist>
 
           <h4>Products ({ROWS} rows)</h4>
-          <div style={{ overflowX: "auto" }}>
+          <div className="table-wrap">
             <table className="edit-table">
               <thead>
                 <tr>
@@ -555,16 +544,19 @@ export function BillingPage() {
                   <tr key={idx}>
                     <td>{idx + 1}</td>
                     <td>
-                      <input
-                        aria-label="Product description"
+                      <ProductAutocomplete
                         disabled={readOnly}
-                        list="prod-list"
                         value={row.description}
-                        onChange={(e) => {
-                          const description = e.target.value;
+                        onChange={(description) => {
                           changeLine(idx, {
                             description,
-                            unit: inferUnitFromDescription(description),
+                          });
+                        }}
+                        onSelect={(product) => {
+                          changeLine(idx, {
+                            description: product.name,
+                            rate: product.latestRate,
+                            unit: product.unit,
                           });
                         }}
                       />
@@ -611,12 +603,7 @@ export function BillingPage() {
               </tbody>
             </table>
           </div>
-          <datalist id="prod-list">
-            {productOpts.map((p, i) => (
-              <option key={i} value={p} />
-            ))}
-          </datalist>
-          <p style={{ fontSize: "0.8rem", color: "#64748b", marginBottom: 0 }}>
+          <p className="help-text">
             {bill.billType === "contractor"
               ? "Contractor: rate is without GST; 18% is added in net amount."
               : bill.gstMode === "on"

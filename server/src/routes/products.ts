@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  createProduct,
   getAllProducts,
   searchProducts,
   updateProduct,
@@ -40,6 +41,26 @@ router.get("/search", async (req, res) => {
     });
   }
 });
+
+
+/* -------------------------------------------------------------
+   Create Product
+------------------------------------------------------------- */
+
+router.post("/", async (req, res) => {
+  try {
+    const product = await createProduct(req.body);
+
+    return res.status(201).json(product);
+  } catch (error: any) {
+    console.error(error);
+
+    return res.status(400).json({
+      error: error.message,
+    });
+  }
+});
+
 
 /* -------------------------------------------------------------
    Update Product

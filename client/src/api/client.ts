@@ -38,6 +38,19 @@ export function fetchCounter(shop: string) {
   return json<CounterResponse>(`${base}/counters/${shop}`);
 }
 
+
+export interface Product {
+  _id: string;
+  name: string;
+  latestRate: number;
+  unit: string;
+  timesUsed: number;
+  lastUsed: string;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 /* -------------------------------------------------------------------------- */
 /*                                   Bills                                    */
 /* -------------------------------------------------------------------------- */
@@ -127,4 +140,62 @@ export function fetchCustomerSuggestions() {
   return json<{ name: string; mobile: string; place: string }[]>(
     `${base}/bills/meta/autofill/customers`
   );
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                 Products                                   */
+/* -------------------------------------------------------------------------- */
+
+export function createProduct(data: {
+  name: string;
+  latestRate: number;
+  unit: string;
+}) {
+  return json<Product>(`${base}/products`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export function getProducts() {
+  return json<Product[]>(`${base}/products`);
+}
+
+export function searchProducts(query: string) {
+  const params = new URLSearchParams();
+
+  if (query.trim()) {
+    params.set("q", query);
+  }
+
+  return json<Product[]>(
+    `${base}/products/search?${params.toString()}`
+  );
+}
+
+export function updateProduct(
+  id: string,
+  data: Partial<
+    Pick<
+      Product,
+      "name" | "latestRate" | "unit" | "active"
+    >
+  >
+) {
+  return json<Product>(`${base}/products/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
+}
+
+export function toggleProductStatus(
+  id: string,
+  active: boolean
+) {
+  return json<Product>(`${base}/products/${id}/status`, {
+    method: "PATCH",
+    body: JSON.stringify({
+      active,
+    }),
+  });
 }

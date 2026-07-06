@@ -28,6 +28,7 @@ export function BillA4({
   const t = bill.totals;
   const isContractor = bill.billType === "contractor";
   const showGstColumn = isContractor || bill.gstMode === "on";
+  const showDiscountColumn = displayRows.some((r) => Boolean(r.discountPercent));
   const upiUrl = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(shop.name)}&am=${t.grandTotal.toFixed(2)}&cu=INR`;
 
   const dateStr = invoiceDate.toLocaleDateString("en-IN", {
@@ -117,12 +118,16 @@ export function BillA4({
               <th style={{ width: "12%" }} className="a4-num">
                 Rate
               </th>
-              <th style={{ width: "10%" }} className="a4-num">
-                Disc %
-              </th>
-              <th style={{ width: "12%" }} className="a4-num">
-                After Disc
-              </th>
+              {showDiscountColumn && (
+                <>
+                  <th style={{ width: "10%" }} className="a4-num">
+                    Disc %
+                  </th>
+                  <th style={{ width: "12%" }} className="a4-num">
+                    After Disc
+                  </th>
+                </>
+              )}
               {showGstColumn && (
                 <th style={{ width: "8%" }} className="a4-num">
                   GST %
@@ -147,10 +152,14 @@ export function BillA4({
                     <td className="a4-num">{row.qty || ""}</td>
                     <td className="a4-num">{unitText}</td>
                     <td className="a4-num">{row.rate ? formatMoney(row.rate) : ""}</td>
-                    <td className="a4-num">{row.discountPercent ? `${row.discountPercent}` : ""}</td>
-                    <td className="a4-num">{row.afterDiscount ? formatMoney(row.afterDiscount) : ""}</td>
+                    {showDiscountColumn && (
+                      <>
+                        <td className="a4-num">{row.discountPercent ? `${row.discountPercent}` : ""}</td>
+                        <td className="a4-num">{row.afterDiscount ? formatMoney(row.afterDiscount) : ""}</td>
+                      </>
+                    )}
                     {showGstColumn && (
-                      <td className="a4-num">{row.gstPercent ? `${row.gstPercent}%` : ""}</td>
+                      <td className="a4-num">{filled && row.gstPercent ? `${row.gstPercent}%` : ""}</td>
                     )}
                     <td className="a4-num">{row.netAmount ? formatMoney(row.netAmount) : ""}</td>
                   </tr>
@@ -189,10 +198,6 @@ export function BillA4({
                 <span className="a4-num">{formatMoney(t.sgst)}</span>
               </div>
               <div className="a4-totals-row">
-                <span>Freight</span>
-                <span className="a4-num">{formatMoney(t.freight)}</span>
-              </div>
-              <div className="a4-totals-row">
                 <span>Round Off</span>
                 <span className="a4-num">{formatMoney(t.roundOff)}</span>
               </div>
@@ -210,10 +215,6 @@ export function BillA4({
               <div className="a4-totals-row">
                 <span>Discount Total</span>
                 <span className="a4-num">{formatMoney(t.discountTotal)}</span>
-              </div>
-              <div className="a4-totals-row">
-                <span>Freight</span>
-                <span className="a4-num">{formatMoney(t.freight)}</span>
               </div>
               <div className="a4-totals-row">
                 <span>Round Off</span>
@@ -245,10 +246,6 @@ export function BillA4({
               <div className="a4-totals-row">
                 <span>Discount Total</span>
                 <span className="a4-num">{formatMoney(t.discountTotal)}</span>
-              </div>
-              <div className="a4-totals-row">
-                <span>Freight</span>
-                <span className="a4-num">{formatMoney(t.freight)}</span>
               </div>
               <div className="a4-totals-row">
                 <span>Round Off</span>

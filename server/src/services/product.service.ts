@@ -48,6 +48,40 @@ export async function updateOrCreateProduct(
   }
 }
 
+
+/**
+ * Create Product manually.
+ */
+export async function createProduct(data: {
+  name: string;
+  latestRate: number;
+  unit: string;
+}) {
+  const name = normalizeName(data.name);
+
+  if (!name) {
+    throw new Error("Product name is required.");
+  }
+
+  const exists = await Product.findOne({
+    name: new RegExp(`^${name}$`, "i"),
+  });
+
+  if (exists) {
+    throw new Error("Product already exists.");
+  }
+
+  return Product.create({
+    name,
+    latestRate: data.latestRate,
+    unit: data.unit,
+    active: true,
+    timesUsed: 0,
+    lastUsed: new Date(),
+  });
+}
+
+
 /**
  * Returns all active products.
  */
@@ -89,22 +123,36 @@ export async function searchProducts(query: string) {
 export async function updateProduct(
   id: string,
   data: {
+    name?: string;
     latestRate?: number;
     unit?: string;
     active?: boolean;
   }
 ) {
-  return Product.findByIdAndUpdate(
-    id,
-    {
-      ...data,
-      updatedAt: new Date(),
-    },
-    {
-      new: true,
-      runValidators: true,
-    }
-  );
+  const update: Record<string, unknown> = {
+    updatedAt: new Date(),
+  };
+
+  if (data.name !== undefined) {
+    update.name = normalizeName(data.name);
+  }
+
+  if (data.latestRate !== undefined) {
+    update.latestRate = data.latestRate;
+  }
+
+  if (data.unit !== undefined) {
+    update.unit = data.unit;
+  }
+
+  if (data.active !== undefined) {
+    update.active = data.active;
+  }
+
+  return Product.findByIdAndUpdate(id, update, {
+    new: true,
+    runValidators: true,
+  });
 }
 
 /**

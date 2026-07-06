@@ -1,7 +1,7 @@
 export type BillType = "contractor" | "normal";
 export type ShopId = "sivasakthi" | "meenatchi";
 export type GstMode = "on" | "off";
-export type BillStatus = "active" | "cancelled";
+export type BillStatus = "active" | "cancelled" | "draft" | "saved";
 
 export interface Customer {
   name: string;
