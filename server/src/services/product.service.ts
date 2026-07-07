@@ -1,4 +1,5 @@
 import Product from "../models/Product";
+import { formatName } from "../utils/text.js";
 
 export interface ProductInput {
   description: string;
@@ -7,7 +8,7 @@ export interface ProductInput {
 }
 
 function normalizeName(name: string): string {
-  return name.trim().replace(/\s+/g, " ");
+  return formatName(name).replace(/\s+/g, " ");
 }
 
 /**
@@ -48,7 +49,6 @@ export async function updateOrCreateProduct(
   }
 }
 
-
 /**
  * Create Product manually.
  */
@@ -80,7 +80,6 @@ export async function createProduct(data: {
     lastUsed: new Date(),
   });
 }
-
 
 /**
  * Returns all active products.

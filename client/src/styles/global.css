@@ -434,3 +434,39 @@ button {
 .product-table .btn {
   width: 100%;
 }
+
+/* ===========================================================
+   DASHBOARD
+=========================================================== */
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.dashboard-card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.08);
+  transition: .2s;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,.12);
+}
+
+.dashboard-title {
+  color: #64748b;
+  font-size: .9rem;
+  font-weight: 600;
+}
+
+.dashboard-value {
+  margin-top: 12px;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0f172a;
+}

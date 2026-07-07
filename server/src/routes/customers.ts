@@ -1,123 +1,127 @@
 import { Router } from "express";
 import {
-  createProduct,
-  getAllProducts,
-  searchProducts,
-  updateProduct,
-  toggleProductStatus,
-} from "../services/product.service.js";
-import { formatName } from "../utils/text.js";
+  createCustomer,
+  getAllCustomers,
+  searchCustomers,
+  updateCustomer,
+  toggleCustomerStatus,
+} from "../services/customer.service.js";
 
 const router = Router();
 
 /* -------------------------------------------------------------
-   Get All Products
+   Get All Customers
 ------------------------------------------------------------- */
+
 router.get("/", async (_req, res) => {
   try {
-    const products = await getAllProducts();
-    return res.json(products);
+    const customers = await getAllCustomers();
+
+    return res.json(customers);
   } catch (error) {
     console.error(error);
+
     return res.status(500).json({
-      error: "Failed to fetch products",
+      error: "Failed to fetch customers",
     });
   }
 });
 
 /* -------------------------------------------------------------
-   Search Products
+   Search Customers
 ------------------------------------------------------------- */
+
 router.get("/search", async (req, res) => {
   try {
     const q = String(req.query.q ?? "");
 
-    const products = await searchProducts(q);
+    const customers = await searchCustomers(q);
 
-    return res.json(products);
+    return res.json(customers);
   } catch (error) {
     console.error(error);
+
     return res.status(500).json({
       error: "Search failed",
     });
   }
 });
 
+
+
 /* -------------------------------------------------------------
-   Create Product
+   Create Customer
 ------------------------------------------------------------- */
 
 router.post("/", async (req, res) => {
   try {
-    const product = await createProduct({
-      ...req.body,
-      name: formatName(req.body.name ?? ""),
-    });
+    const customer = await createCustomer(req.body);
 
-    return res.status(201).json(product);
-  } catch (error: any) {
+    return res.status(201).json(customer);
+  } catch (error) {
     console.error(error);
 
     return res.status(400).json({
-      error: error.message,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to create customer",
     });
   }
 });
 
 /* -------------------------------------------------------------
-   Update Product
+   Update Customer
 ------------------------------------------------------------- */
 
 router.put("/:id", async (req, res) => {
   try {
-    const product = await updateProduct(req.params.id, {
-      ...req.body,
-      ...(req.body.name && {
-        name: formatName(req.body.name),
-      }),
-    });
+    const customer = await updateCustomer(
+      req.params.id,
+      req.body
+    );
 
-    if (!product) {
+    if (!customer) {
       return res.status(404).json({
-        error: "Product not found",
+        error: "Customer not found",
       });
     }
 
-    return res.json(product);
+    return res.json(customer);
   } catch (error) {
     console.error(error);
 
     return res.status(500).json({
-      error: "Failed to update product",
+      error: "Failed to update customer",
     });
   }
 });
 
 /* -------------------------------------------------------------
-   Enable / Disable Product
+   Enable / Disable Customer
 ------------------------------------------------------------- */
 
 router.patch("/:id/status", async (req, res) => {
   try {
     const { active } = req.body;
 
-    const product = await toggleProductStatus(
+    const customer = await toggleCustomerStatus(
       req.params.id,
       Boolean(active)
     );
 
-    if (!product) {
+    if (!customer) {
       return res.status(404).json({
-        error: "Product not found",
+        error: "Customer not found",
       });
     }
 
-    return res.json(product);
+    return res.json(customer);
   } catch (error) {
     console.error(error);
 
     return res.status(500).json({
-      error: "Failed to update product status",
+      error: "Failed to update customer status",
     });
   }
 });

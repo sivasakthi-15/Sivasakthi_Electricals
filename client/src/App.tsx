@@ -1,8 +1,18 @@
-import { BrowserRouter, Link, Navigate, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter,
+  Link,
+  Navigate,
+  Route,
+  Routes,
+} from "react-router-dom";
+
 import { BillingPage } from "@/pages/BillingPage";
 import { HomePage } from "@/pages/HomePage";
 import { ViewBillsPage } from "@/pages/ViewBillsPage";
-import { ProductsPage } from "@/pages/ProductsPage"; // NEW
+import { ProductsPage } from "@/pages/ProductsPage";
+import CustomersPage from "@/pages/CustomersPage";
+import DashboardPage from "@/pages/DashboardPage";
+import ReportsPage from "@/pages/ReportsPage";
 
 export function App() {
   return (
@@ -14,9 +24,17 @@ export function App() {
           <nav>
             <Link to="/">Home</Link>
 
+            <Link to="/dashboard">Dashboard</Link>
+
+            <Link to="/bill">Billing</Link>
+
             <Link to="/bills">Bills</Link>
 
-            <Link to="/products">Products</Link> {/* NEW */}
+            <Link to="/products">Products</Link>
+
+            <Link to="/customers">Customers</Link>
+
+            <Link to="/reports">Reports</Link>
           </nav>
         </header>
 
@@ -24,13 +42,40 @@ export function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
 
-            <Route path="/bill" element={<BillingPage />} />
+            <Route
+              path="/dashboard"
+              element={<DashboardPage />}
+            />
 
-            <Route path="/bills" element={<ViewBillsPage />} />
+            <Route
+              path="/bill"
+              element={<BillingPage />}
+            />
 
-            <Route path="/products" element={<ProductsPage />} /> {/* NEW */}
+            <Route
+              path="/bills"
+              element={<ViewBillsPage />}
+            />
 
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route
+              path="/products"
+              element={<ProductsPage />}
+            />
+
+            <Route
+              path="/customers"
+              element={<CustomersPage />}
+            />
+
+            <Route
+              path="/reports"
+              element={<ReportsPage />}
+            />
+
+            <Route
+              path="*"
+              element={<Navigate to="/" replace />}
+            />
           </Routes>
         </main>
       </div>

@@ -25,6 +25,8 @@ import { clearDraft, loadDraft, useAutoSaveDraft } from "@/hooks/useDraftStorage
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { createEmptyBill, defaultItems, emptyLine, ROWS } from "@/state/emptyBill";
 import { ProductAutocomplete } from "@/components/ProductAutocomplete";
+import { formatName } from "@/utils/text";
+
 
 function padItems(items: LineItem[]): LineItem[] {
   const next = items.slice(0, ROWS).map((x) => ({ ...x }));
@@ -59,7 +61,12 @@ function inferUnitFromDescription(description: string): string {
   const s = description.trim().toLowerCase();
   if (!s) return "Nos";
 
-  const meterKeywords = ["wire", "cable", "pipe", "pvc"];
+  const meterKeywords = [
+  "wire",
+  "cable",
+  "pipe",
+  "hose",
+];
   if (meterKeywords.some((k) => s.includes(k))) return "Meter";
 
   const nosKeywords = [
@@ -548,13 +555,16 @@ export function BillingPage() {
                         disabled={readOnly}
                         value={row.description}
                         onChange={(description) => {
+                          const formatted = formatName(description);
+
                           changeLine(idx, {
-                            description,
+                            description: formatted,
+                            unit: inferUnitFromDescription(formatted),
                           });
                         }}
                         onSelect={(product) => {
                           changeLine(idx, {
-                            description: product.name,
+                            description: formatName(product.name),
                             rate: product.latestRate,
                             unit: product.unit,
                           });

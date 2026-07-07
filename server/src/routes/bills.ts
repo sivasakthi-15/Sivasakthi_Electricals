@@ -7,7 +7,7 @@ import {
   getFinancialYearLabel,
   shopIdToKey,
 } from "../services/billNumber.js";
-
+import { updateOrCreateCustomer } from "../services/customer.service.js";
 const router = Router();
 
 /** Single-document $inc is atomic — works on standalone MongoDB (no replica set). */
@@ -122,6 +122,13 @@ router.post("/", async (req, res) => {
         unit: item.unit,
       }))
     );
+
+    await updateOrCreateCustomer({
+      name: doc.customer?.name ?? "",
+      mobile: doc.customer?.mobile ?? "",
+      place: doc.customer?.place ?? "",
+      billAmount: doc.totals?.grandTotal ?? 0,
+    });
 
     return res.status(201).json(doc.toObject());
   } catch (e) {

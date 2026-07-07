@@ -51,6 +51,101 @@ export interface Product {
   updatedAt: string;
 }
 
+
+export interface Customer {
+  _id: string;
+  name: string;
+  mobile: string;
+  place: string;
+  timesVisited: number;
+  totalPurchase: number;
+  lastVisit: string;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DashboardRecentBill {
+  _id: string;
+  billNumber: string;
+  status: string;
+  createdAt: string;
+  customer: {
+    name: string;
+    mobile: string;
+    place: string;
+  };
+  totals: {
+    grandTotal: number;
+  };
+}
+
+export interface DashboardData {
+  todaySales: number;
+  todayBills: number;
+  monthSales: number;
+  totalProducts: number;
+  activeProducts: number;
+  totalCustomers: number;
+  cancelledBills: number;
+  recentBills: DashboardRecentBill[];
+  topProducts: TopProduct[];
+}
+
+export interface TopProduct {
+  name: string;
+  qty: number;
+}
+
+export interface ReportSummary {
+  totalBills: number;
+  totalSales: number;
+  cancelledBills: number;
+  gstCollected: number;
+}
+
+export interface ReportBill {
+  _id: string;
+  billNumber: string;
+  status: string;
+  createdAt: string;
+  customer: {
+    name: string;
+    mobile: string;
+    place: string;
+  };
+  totals: {
+    grandTotal: number;
+    cgst?: number;
+    sgst?: number;
+  };
+}
+
+export interface ReportsResponse {
+  summary: ReportSummary;
+  bills: ReportBill[];
+}
+
+export interface ReportProduct {
+  name: string;
+  qty: number;
+}
+
+export interface ReportsResponse {
+  summary: ReportSummary;
+  bills: ReportBill[];
+  products: ReportProduct[];
+  customers: ReportCustomer[];
+}
+
+export interface ReportCustomer {
+  name: string;
+  bills: number;
+  purchase: number;
+  lastVisit: string;
+}
+
+
 /* -------------------------------------------------------------------------- */
 /*                                   Bills                                    */
 /* -------------------------------------------------------------------------- */
@@ -198,4 +293,96 @@ export function toggleProductStatus(
       active,
     }),
   });
+}
+
+
+/* -------------------------------------------------------------------------- */
+/*                                 Customers                                  */
+/* -------------------------------------------------------------------------- */
+
+export function createCustomer(data: {
+  name: string;
+  mobile: string;
+  place: string;
+}) {
+  return json<Customer>(`${base}/customers`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export function getCustomers() {
+  return json<Customer[]>(`${base}/customers`);
+}
+
+export function searchCustomers(query: string) {
+  const params = new URLSearchParams();
+
+  if (query.trim()) {
+    params.set("q", query);
+  }
+
+  return json<Customer[]>(
+    `${base}/customers/search?${params.toString()}`
+  );
+}
+
+export function updateCustomer(
+  id: string,
+  data: Partial<
+    Pick<Customer, "name" | "mobile" | "place" | "active">
+  >
+) {
+  return json<Customer>(`${base}/customers/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
+}
+
+export function toggleCustomerStatus(
+  id: string,
+  active: boolean
+) {
+  return json<Customer>(
+    `${base}/customers/${id}/status`,
+    {
+      method: "PATCH",
+      body: JSON.stringify({
+        active,
+      }),
+    }
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                  Reports                                   */
+/* -------------------------------------------------------------------------- */
+
+export function fetchReports(
+  from?: string,
+  to?: string
+) {
+  const params = new URLSearchParams();
+
+  if (from) {
+    params.set("from", from);
+  }
+
+  if (to) {
+    params.set("to", to);
+  }
+
+  const query = params.toString();
+
+  return json<ReportsResponse>(
+    `${base}/reports${query ? `?${query}` : ""}`
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                Dashboard                                   */
+/* -------------------------------------------------------------------------- */
+
+export function fetchDashboard() {
+  return json<DashboardData>(`${base}/dashboard`);
 }
