@@ -1,0 +1,189 @@
+/* ===========================
+   INVENTORY PAGE
+=========================== */
+
+.inventory-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ===========================
+   HEADER
+=========================== */
+
+.inventory-header h1 {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.inventory-header p {
+  margin-top: 6px;
+  color: #64748b;
+  font-size: 15px;
+}
+
+/* ===========================
+   SUMMARY CARDS
+=========================== */
+
+.inventory-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.summary-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 20px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+  transition: all 0.2s ease;
+}
+
+.summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+}
+
+.summary-card h3 {
+  margin: 0;
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.summary-card h2 {
+  margin-top: 12px;
+  font-size: 28px;
+  color: #0f172a;
+}
+
+/* ===========================
+   TOOLBAR
+=========================== */
+
+.inventory-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.inventory-toolbar input {
+  width: 340px;
+  padding: 11px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 15px;
+  outline: none;
+  transition: border 0.2s ease;
+}
+
+.inventory-toolbar input:focus {
+  border-color: #2563eb;
+}
+
+/* ===========================
+   TABLE
+=========================== */
+
+.inventory-table {
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+}
+
+.inventory-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.inventory-table thead {
+  background: #f8fafc;
+}
+
+.inventory-table th {
+  text-align: left;
+  padding: 16px;
+  font-size: 14px;
+  color: #475569;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.inventory-table td {
+  padding: 16px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.inventory-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+/* ===========================
+   STATUS BADGES
+=========================== */
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 100px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.status.instock {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status.lowstock {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status.outofstock {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+/* ===========================
+   RESPONSIVE
+=========================== */
+
+@media (max-width: 1100px) {
+  .inventory-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .inventory-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .inventory-toolbar input {
+    width: 100%;
+  }
+}
+
+@media (max-width: 700px) {
+  .inventory-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .inventory-table {
+    overflow-x: auto;
+  }
+
+  .inventory-table table {
+    min-width: 700px;
+  }
+}

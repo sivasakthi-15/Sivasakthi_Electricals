@@ -1,84 +1,100 @@
 import {
   BrowserRouter,
-  Link,
   Navigate,
   Route,
   Routes,
 } from "react-router-dom";
 
+import Layout from "@/components/layout/Layout";
+
+import DashboardPage from "@/pages/DashboardPage";
 import { BillingPage } from "@/pages/BillingPage";
-import { HomePage } from "@/pages/HomePage";
 import { ViewBillsPage } from "@/pages/ViewBillsPage";
 import { ProductsPage } from "@/pages/ProductsPage";
 import CustomersPage from "@/pages/CustomersPage";
-import DashboardPage from "@/pages/DashboardPage";
+import InventoryPage from "@/pages/InventoryPage";
 import ReportsPage from "@/pages/ReportsPage";
 
 export function App() {
   return (
     <BrowserRouter>
-      <div className="app-shell">
-        <header className="app-topbar">
-          <h1>Electrical Shop Billing &amp; POS</h1>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route
+            path="/"
+            element={<DashboardPage />}
+          />
 
-          <nav>
-            <Link to="/">Home</Link>
+          <Route
+            path="/billing"
+            element={<BillingPage />}
+          />
 
-            <Link to="/dashboard">Dashboard</Link>
+          <Route
+            path="/bills"
+            element={<ViewBillsPage />}
+          />
 
-            <Link to="/bill">Billing</Link>
+          <Route
+            path="/products"
+            element={<ProductsPage />}
+          />
 
-            <Link to="/bills">Bills</Link>
+          <Route
+            path="/customers"
+            element={<CustomersPage />}
+          />
 
-            <Link to="/products">Products</Link>
+          <Route
+            path="/inventory"
+            element={<InventoryPage />}
+          />
 
-            <Link to="/customers">Customers</Link>
+          <Route
+            path="/reports"
+            element={<ReportsPage />}
+          />
 
-            <Link to="/reports">Reports</Link>
-          </nav>
-        </header>
+          {/* Future Modules */}
 
-        <main className="app-main">
-          <Routes>
-            <Route path="/" element={<HomePage />} />
+          <Route
+            path="/purchase"
+            element={
+              <div>
+                <h2>Purchase Module</h2>
+                <p>Coming Soon...</p>
+              </div>
+            }
+          />
 
-            <Route
-              path="/dashboard"
-              element={<DashboardPage />}
-            />
+          <Route
+            path="/suppliers"
+            element={
+              <div>
+                <h2>Suppliers Module</h2>
+                <p>Coming Soon...</p>
+              </div>
+            }
+          />
 
-            <Route
-              path="/bill"
-              element={<BillingPage />}
-            />
+          <Route
+            path="/settings"
+            element={
+              <div>
+                <h2>Settings</h2>
+                <p>Coming Soon...</p>
+              </div>
+            }
+          />
+        </Route>
 
-            <Route
-              path="/bills"
-              element={<ViewBillsPage />}
-            />
-
-            <Route
-              path="/products"
-              element={<ProductsPage />}
-            />
-
-            <Route
-              path="/customers"
-              element={<CustomersPage />}
-            />
-
-            <Route
-              path="/reports"
-              element={<ReportsPage />}
-            />
-
-            <Route
-              path="*"
-              element={<Navigate to="/" replace />}
-            />
-          </Routes>
-        </main>
-      </div>
+        <Route
+          path="*"
+          element={<Navigate to="/" replace />}
+        />
+      </Routes>
     </BrowserRouter>
   );
 }
+
+export default App;

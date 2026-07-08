@@ -1,0 +1,185 @@
+/* ===========================
+   APP LAYOUT
+=========================== */
+
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f8fafc;
+}
+
+/* ===========================
+   SIDEBAR
+=========================== */
+
+.sidebar {
+  width: 260px;
+  background: #0f172a;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  overflow-y: auto;
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 24px 20px;
+  border-bottom: 1px solid #1e293b;
+}
+
+.logo-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
+  background: #2563eb;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 22px;
+}
+
+.sidebar-logo h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.sidebar-logo p {
+  margin: 2px 0 0;
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 18px 12px;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: #e2e8f0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  margin-bottom: 6px;
+  transition: all 0.2s ease;
+  font-size: 15px;
+}
+
+.sidebar-item:hover {
+  background: #1e293b;
+}
+
+.sidebar-item.active {
+  background: #2563eb;
+  color: white;
+}
+
+.sidebar-item.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  justify-content: space-between;
+}
+
+.sidebar-item.disabled small {
+  font-size: 10px;
+  color: #cbd5e1;
+}
+
+.sidebar-footer {
+  border-top: 1px solid #1e293b;
+  padding: 18px;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+/* ===========================
+   MAIN CONTENT
+=========================== */
+
+.main-content {
+  margin-left: 260px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ===========================
+   HEADER
+=========================== */
+
+.header {
+  height: 70px;
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 28px;
+}
+
+.header-title h1 {
+  margin: 0;
+  font-size: 22px;
+  color: #1e293b;
+}
+
+.header-title p {
+  margin: 4px 0 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+/* ===========================
+   PAGE CONTENT
+=========================== */
+
+.page-content {
+  flex: 1;
+  padding: 24px;
+  background: #f8fafc;
+}
+
+/* ===========================
+   HEADER USER
+=========================== */
+
+.header-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #2563eb;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.user-info h4 {
+  margin: 0;
+  font-size: 15px;
+  color: #1e293b;
+}
+
+.user-info span {
+  font-size: 12px;
+  color: #64748b;
+}

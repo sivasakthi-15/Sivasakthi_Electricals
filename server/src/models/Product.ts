@@ -33,6 +33,40 @@ const productSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+
+    // ===========================
+    // Inventory Fields
+    // ===========================
+
+    currentStock: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+
+    minimumStock: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+
+    reorderLevel: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+
+    purchaseRate: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+
+    sellingRate: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
   },
   {
     timestamps: true,

@@ -8,6 +8,8 @@ import productsRouter from "./routes/products.js";
 import customerRoutes from "./routes/customers.js";
 import dashboardRouter from "./routes/dashboard.js";
 import reportsRouter from "./routes/reports.js";
+import inventoryRoutes from "./routes/inventory.js";
+
 
 const PORT = Number(process.env.PORT) || 4000;
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/electrical_billing";
@@ -22,6 +24,7 @@ app.use("/api/bills", billsRouter);
 app.use("/api/products", productsRouter);
 app.use("/api/dashboard", dashboardRouter);
 app.use("/api/reports", reportsRouter);
+app.use("/api/inventory", inventoryRoutes);
 
 
 app.get("/api/health", (_req, res) => res.json({ ok: true }));
