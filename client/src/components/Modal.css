@@ -38,6 +38,28 @@
   line-height: 1;
   cursor: pointer;
   color: #64748b;
+  transition: all 0.2s ease;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  min-height: 32px;
+}
+
+.modal-x:hover {
+  color: #0f172a;
+  background: #f1f5f9;
+  border-radius: 6px;
+}
+
+.modal-x:active {
+  background: #e2e8f0;
+}
+
+.modal-x:focus {
+  outline: 2px solid rgba(14, 165, 233, 0.5);
+  outline-offset: -2px;
 }
 
 .modal-body {

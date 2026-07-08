@@ -17,8 +17,11 @@ const router = Router();
 router.get("/summary", async (_req, res) => {
   try {
     const data = await getInventorySummary();
+
     res.json(data);
   } catch (error) {
+    console.error(error);
+
     res.status(500).json({
       message: "Failed to load inventory summary",
     });
@@ -31,8 +34,11 @@ router.get("/summary", async (_req, res) => {
 router.get("/low-stock", async (_req, res) => {
   try {
     const products = await getLowStock();
+
     res.json(products);
   } catch (error) {
+    console.error(error);
+
     res.status(500).json({
       message: "Failed to load low stock products",
     });
@@ -43,10 +49,28 @@ router.get("/low-stock", async (_req, res) => {
  * Stock History
  */
 router.get("/history/:productId", async (req, res) => {
+  console.log("\n==============================");
+  console.log("Inventory History Request");
+  console.log("==============================");
+
+  console.log("Requested Product ID:", req.params.productId);
+
   try {
     const history = await getStockHistory(req.params.productId);
+
+    console.log("Transactions Found:", history.length);
+
+    if (history.length > 0) {
+      console.log(
+        "Transaction Product IDs:",
+        history.map((h: any) => h.product?._id?.toString())
+      );
+    }
+
     res.json(history);
   } catch (error) {
+    console.error("History Error:", error);
+
     res.status(500).json({
       message: "Failed to load stock history",
     });
@@ -59,10 +83,16 @@ router.get("/history/:productId", async (req, res) => {
 router.get("/", async (_req, res) => {
   try {
     const products = await getInventory();
+
     res.json(products);
   } catch (error) {
+    console.error(error);
+
     res.status(500).json({
-      message: "Failed to load inventory",
+      message:
+        error instanceof Error
+          ? error.message
+          : "Failed to load inventory",
     });
   }
 });
@@ -82,6 +112,8 @@ router.post("/stock-in", async (req, res) => {
 
     res.json(product);
   } catch (error: any) {
+    console.error(error);
+
     res.status(400).json({
       message: error.message,
     });
@@ -103,6 +135,8 @@ router.post("/stock-out", async (req, res) => {
 
     res.json(product);
   } catch (error: any) {
+    console.error(error);
+
     res.status(400).json({
       message: error.message,
     });
@@ -124,6 +158,8 @@ router.post("/adjust", async (req, res) => {
 
     res.json(product);
   } catch (error: any) {
+    console.error(error);
+
     res.status(400).json({
       message: error.message,
     });

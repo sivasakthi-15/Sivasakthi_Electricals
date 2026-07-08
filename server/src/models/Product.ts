@@ -2,6 +2,10 @@ import mongoose from "mongoose";
 
 const productSchema = new mongoose.Schema(
   {
+    // ===========================
+    // Basic Information
+    // ===========================
+
     name: {
       type: String,
       required: true,
@@ -9,33 +13,61 @@ const productSchema = new mongoose.Schema(
       trim: true,
     },
 
-    latestRate: {
-      type: Number,
-      default: 0,
+    category: {
+      type: String,
+      default: "General",
+      trim: true,
     },
 
     unit: {
       type: String,
+      default: "Nos",
+      trim: true,
+    },
+
+    barcode: {
+      type: String,
       default: "",
+      trim: true,
     },
 
-    timesUsed: {
+    hsnCode: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    gst: {
       type: Number,
-      default: 0,
-    },
-
-    lastUsed: {
-      type: Date,
-      default: Date.now,
-    },
-
-    active: {
-      type: Boolean,
-      default: true,
+      default: 18,
+      min: 0,
+      max: 100,
     },
 
     // ===========================
-    // Inventory Fields
+    // Pricing
+    // ===========================
+
+    latestRate: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+
+    purchaseRate: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+
+    sellingRate: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+
+    // ===========================
+    // Inventory
     // ===========================
 
     currentStock: {
@@ -56,21 +88,37 @@ const productSchema = new mongoose.Schema(
       min: 0,
     },
 
-    purchaseRate: {
+    // ===========================
+    // Analytics
+    // ===========================
+
+    timesUsed: {
       type: Number,
       default: 0,
-      min: 0,
     },
 
-    sellingRate: {
-      type: Number,
-      default: 0,
-      min: 0,
+    lastUsed: {
+      type: Date,
+      default: Date.now,
+    },
+
+    // ===========================
+    // Status
+    // ===========================
+
+    active: {
+      type: Boolean,
+      default: true,
     },
   },
   {
     timestamps: true,
   }
 );
+
+// Useful indexes
+productSchema.index({ name: 1 });
+productSchema.index({ category: 1 });
+productSchema.index({ barcode: 1 });
 
 export default mongoose.model("Product", productSchema);

@@ -1,25 +1,45 @@
+import { ReactNode } from "react";
+
 interface StockCardProps {
   title: string;
   value: string | number;
+  icon?: ReactNode;
+  iconBg?: string;
   warning?: boolean;
 }
 
 export default function StockCard({
   title,
   value,
+  icon,
+  iconBg = "icon-blue",
   warning = false,
 }: StockCardProps) {
   return (
     <div
-      className={`rounded-lg border p-4 shadow-sm ${
-        warning
-          ? "border-red-300 bg-red-50"
-          : "border-gray-200 bg-white"
+      className={`summary-card ${
+        warning ? "warning-card" : ""
       }`}
     >
-      <h3 className="text-sm text-gray-500">{title}</h3>
+      <div className="summary-top">
+        <div>
+          <p className="summary-title">
+            {title}
+          </p>
 
-      <p className="mt-2 text-2xl font-bold">{value}</p>
+          <h2 className="summary-value">
+            {value}
+          </h2>
+        </div>
+
+        {icon && (
+          <div
+            className={`summary-icon ${iconBg}`}
+          >
+            {icon}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

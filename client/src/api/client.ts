@@ -41,12 +41,32 @@ export function fetchCounter(shop: string) {
 
 export interface Product {
   _id: string;
+
+  // Basic Information
   name: string;
-  latestRate: number;
+  category: string;
   unit: string;
+  barcode: string;
+  hsnCode: string;
+  gst: number;
+
+  // Pricing
+  latestRate: number;
+  purchaseRate: number;
+  sellingRate: number;
+
+  // Inventory
+  currentStock: number;
+  minimumStock: number;
+  reorderLevel: number;
+
+  // Analytics
   timesUsed: number;
   lastUsed: string;
+
+  // Status
   active: boolean;
+
   createdAt: string;
   updatedAt: string;
 }
@@ -146,14 +166,24 @@ export interface ReportCustomer {
 
 export interface InventoryProduct {
   _id: string;
+
   name: string;
+  category: string;
+
   latestRate: number;
   purchaseRate: number;
   sellingRate: number;
+
   currentStock: number;
   minimumStock: number;
   reorderLevel: number;
+
   unit: string;
+
+  barcode: string;
+  hsnCode: string;
+  gst: number;
+
   active: boolean;
 }
 
@@ -278,9 +308,21 @@ export function fetchCustomerSuggestions() {
 
 export function createProduct(data: {
   name: string;
-  latestRate: number;
+  category: string;
   unit: string;
-}) {
+
+  latestRate: number;
+  purchaseRate: number;
+  sellingRate: number;
+
+  currentStock: number;
+  minimumStock: number;
+  reorderLevel: number;
+
+  barcode: string;
+  hsnCode: string;
+  gst: number;
+}){
   return json<Product>(`${base}/products`, {
     method: "POST",
     body: JSON.stringify(data),
@@ -308,7 +350,19 @@ export function updateProduct(
   data: Partial<
     Pick<
       Product,
-      "name" | "latestRate" | "unit" | "active"
+      | "name"
+      | "category"
+      | "unit"
+      | "barcode"
+      | "hsnCode"
+      | "gst"
+      | "latestRate"
+      | "purchaseRate"
+      | "sellingRate"
+      | "currentStock"
+      | "minimumStock"
+      | "reorderLevel"
+      | "active"
     >
   >
 ) {
@@ -431,35 +485,35 @@ export async function getInventory() {
 }
 
 export async function getInventorySummary() {
-  return json<InventorySummary>("/inventory/summary");
+  return json<InventorySummary>(`${base}/inventory/summary`);
 }
 
 export async function getLowStockProducts() {
-  return json<InventoryProduct[]>("/inventory/low-stock");
+  return json<InventoryProduct[]>(`${base}/inventory/low-stock`);
 }
 
 export async function getStockHistory(productId: string) {
   return json<InventoryTransaction[]>(
-    `/inventory/history/${productId}`
+    `${base}/inventory/history/${productId}`
   );
 }
 
 export async function stockIn(payload: StockPayload) {
-  return json<InventoryProduct>("/inventory/stock-in", {
+  return json<InventoryProduct>(`${base}/inventory/stock-in`, {
     method: "POST",
     body: JSON.stringify(payload),
   });
 }
 
 export async function stockOut(payload: StockPayload) {
-  return json<InventoryProduct>("/inventory/stock-out", {
+  return json<InventoryProduct>(`${base}/inventory/stock-out`, {
     method: "POST",
     body: JSON.stringify(payload),
   });
 }
 
 export async function adjustStock(payload: StockPayload) {
-  return json<InventoryProduct>("/inventory/adjust", {
+  return json<InventoryProduct>(`${base}/inventory/adjust`, {
     method: "POST",
     body: JSON.stringify(payload),
   });

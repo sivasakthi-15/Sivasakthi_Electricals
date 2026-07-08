@@ -78,13 +78,21 @@ export async function adjustStock(
     throw new Error("Product not found");
   }
 
+  const oldStock = product.currentStock;
+  const difference = quantity - oldStock;
+
+  // Nothing changed
+  if (difference === 0) {
+    return product;
+  }
+
   product.currentStock = quantity;
   await product.save();
 
   await InventoryTransaction.create({
     product: product._id,
     type: "ADJUSTMENT",
-    quantity,
+    quantity: difference,
     balanceAfter: product.currentStock,
     remarks,
   });

@@ -44,13 +44,31 @@ export function ProductTable({
       <table className="product-table">
         <thead>
           <tr>
-            <th style={{ width: "35%" }}>Product</th>
-            <th className="num">Rate</th>
+            <th>Product</th>
+
+            <th>Category</th>
+
+            <th className="num">Purchase</th>
+
+            <th className="num">Selling</th>
+
+            <th className="num">Stock</th>
+
+            <th className="num">Min</th>
+
             <th>Unit</th>
+
+            <th className="num">GST</th>
+
             <th className="num">Used</th>
+
             <th>Last Used</th>
+
             <th>Status</th>
-            <th style={{ width: "180px" }}>Action</th>
+
+            <th style={{ width: "180px" }}>
+              Actions
+            </th>
           </tr>
         </thead>
 
@@ -58,22 +76,42 @@ export function ProductTable({
           {products.map((product) => (
             <tr key={product._id}>
               <td>
-                <div className="product-name">
-                  {product.name}
-                </div>
+                <strong>{product.name}</strong>
+              </td>
+
+              <td>{product.category}</td>
+
+              <td className="num">
+                ₹
+                {product.purchaseRate.toFixed(2)}
               </td>
 
               <td className="num">
-                ₹{product.latestRate.toFixed(2)}
+                ₹
+                {product.sellingRate.toFixed(2)}
               </td>
 
-              <td>{product.unit || "-"}</td>
+              <td className="num">
+                {product.currentStock}
+              </td>
+
+              <td className="num">
+                {product.minimumStock}
+              </td>
+
+              <td>{product.unit}</td>
+
+              <td className="num">
+                {product.gst}%
+              </td>
 
               <td className="num">
                 {product.timesUsed}
               </td>
 
-              <td>{formatDate(product.lastUsed)}</td>
+              <td>
+                {formatDate(product.lastUsed)}
+              </td>
 
               <td>
                 <span
@@ -91,11 +129,12 @@ export function ProductTable({
 
               <td>
                 <div className="row-actions">
-
                   <button
                     type="button"
                     className="btn btn-secondary"
-                    onClick={() => onEdit(product)}
+                    onClick={() =>
+                      onEdit(product)
+                    }
                   >
                     Edit
                   </button>
@@ -115,10 +154,8 @@ export function ProductTable({
                       ? "Disable"
                       : "Enable"}
                   </button>
-
                 </div>
               </td>
-
             </tr>
           ))}
         </tbody>
