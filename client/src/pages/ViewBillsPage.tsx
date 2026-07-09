@@ -54,7 +54,7 @@ export function ViewBillsPage() {
   };
 
   const edit = (row: Row) => {
-    nav(`/bill?edit=${row._id}`, {
+    nav(`/billing?edit=${row._id}`, {
       state: {
         from: "/bills",
       },
@@ -62,7 +62,7 @@ export function ViewBillsPage() {
   };
 
   const view = (row: Row) => {
-    nav(`/bill?view=${row._id}`, {
+    nav(`/billing?view=${row._id}`, {
       state: {
         from: "/bills",
       },
@@ -70,7 +70,7 @@ export function ViewBillsPage() {
   };
 
   const duplicate = (row: Row) => {
-    nav(`/bill?duplicate=${row._id}`, {
+    nav(`/billing?duplicate=${row._id}`, {
       state: {
         from: "/bills",
       },
